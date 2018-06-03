@@ -42,7 +42,7 @@ head(MDF) смотрим новый датафрейм. теперь с ним �
 
 
 ##############    ЧАСТЬ 2. Создаем коррелограмму ########################
-#  шаг-1. Делаем корреляционную матрицу з нашего датафрейма MDF, используя метод Пирсона, т.к. все данные нормально распределены. Т.к. данных много, то половину из них делаем NA. Сreate the correlation matrix using Pearson because all the variables are normally distributed. Since a correlation matrix has redundant information I’m setting half of it to NA.
+#  шаг-1. Делаем корреляционную матрицу из нашего датафрейма MDF, используя метод Пирсона, т.к. все данные нормально распределены. Т.к. данных много, то половину из них делаем NA. Сreate the correlation matrix using Pearson because all the variables are normally distributed. Since a correlation matrix has redundant information I’m setting half of it to NA.
 thecor<-round(cor(MDF[,sort(c("profile1", "profile2", "profile3", "profile4", "profile5", "profile6", "profile7", "profile8", "profile9", "profile10","profile11", "profile12", "profile13", "profile14", "profile15", "profile16", "profile17", "profile18", "profile19", "profile20","profile21", "profile22", "profile23", "profile24", "profile25"))], method="pearson", use="pairwise.complete.obs"),2) 
 thecor[lower.tri(thecor)]<- NA 
 thecor
@@ -55,7 +55,7 @@ thecor$Var2<-as.character(thecor$Var2)
 thecor<-na.omit(thecor)
 head(thecor)
 
-#  шаг-3. рисуем кореллограмму используя функцию geom_tile
+#  шаг-3. рисуем коррелограмму используя функцию geom_tile
 Correlogramm_Mariana <- ggplot(thecor, aes(Var2, Var1)) +  
 	geom_tile(data=thecor, aes(fill=value), color="white") +  
 	scale_fill_gradient2(low = "blue", high = "red", mid = "white", midpoint = 0, limit = c(-1,1), name = "Correlation\n(Pearson)") +  
