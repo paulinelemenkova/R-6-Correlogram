@@ -1,61 +1,25 @@
-########### ЧАСТЬ 1 создаем датафрейм
-# шаг-1. вчитываем таблицу. делаем из нее датафрейм.
+# ЧАСТЬ 1: делаем data.frame
+	# шаг-1. вчитываем таблицу. делаем из нее датафрейм.
 MDepths <- read.csv("Depths.csv", header=TRUE, sep = ",")
-
-# шаг-2. чистим датафрейм от NA значений
-df<- na.omit(MDepths) 
-row.has.na <- apply(df, 1, function(x){any(is.na(x))}) # проверяем, удалил ли все NA
+	# шаг-2. чистим датафрейм от NA значений
+MDF <- na.omit(MDepths) 
+row.has.na <- apply(MDF, 1, function(x){any(is.na(x))}) # проверяем, удалил ли все NA
 sum(row.has.na) # суммируем все NA, должно получиться: [1] 0
-head(df) # смотрим очищенный датафрейм.
+head(MDF) # смотрим очищенный датафрейм. теперь с ним работаем.
 
-#шаг-3. создаем ячейки нового датафрейма, вчитываем туда столбцы-колонки из предыдущего датафрейма
-nr_point<- as.numeric(df$observ)
-profile1 <- as.numeric(df$profile1)
-profile2 <- as.numeric(df$profile2)
-profile3 <- as.numeric(df$profile3)
-profile4 <- as.numeric(df$profile4)
-profile5 <- as.numeric(df$profile5)
-profile6 <- as.numeric(df$profile6)
-profile7 <- as.numeric(df$profile7)
-profile8 <- as.numeric(df$profile8)
-profile9 <- as.numeric(df$profile9)
-profile10 <- as.numeric(df$profile10)
-profile11 <- as.numeric(df$profile11)
-profile12 <- as.numeric(df$profile12)
-profile13 <- as.numeric(df$profile13)
-profile14 <- as.numeric(df$profile14)
-profile15 <- as.numeric(df$profile15)
-profile16 <- as.numeric(df$profile16)
-profile17 <- as.numeric(df$profile17)
-profile18 <- as.numeric(df$profile18)
-profile19 <- as.numeric(df$profile19)
-profile20 <- as.numeric(df$profile20)
-profile21 <- as.numeric(df$profile21)
-profile22 <- as.numeric(df$profile22)
-profile23 <- as.numeric(df$profile23)
-profile24 <- as.numeric(df$profile24)
-profile25 <- as.numeric(df$profile25)
-
-# шаг-4. формируем датафрейм
-MDF<- data.frame(nr_point, profile1, profile2, profile3, profile4, profile5, profile6, profile7, profile8, profile9, profile10, profile11, profile12, profile13, profile14, profile15, profile16, profile17, profile18, profile19, profile20, profile21, profile22, profile23, profile24, profile25)
-head(MDF) смотрим новый датафрейм. теперь с ним работаем.
-
-
-##############    ЧАСТЬ 2. Создаем коррелограмму ########################
-#  шаг-1. Делаем корреляционную матрицу из нашего датафрейма MDF, используя метод Пирсона, т.к. все данные нормально распределены. Т.к. данных много, то половину из них делаем NA. Сreate the correlation matrix using Pearson because all the variables are normally distributed. Since a correlation matrix has redundant information I’m setting half of it to NA.
+# ЧАСТЬ 2. Создаем коррелограмму
+	#  шаг-3. Делаем корреляционную матрицу з нашего датафрейма MDF, используя метод Пирсона, т.к. все данные нормально распределены. Т.к. данных много, то половину из них делаем NA. Сreate the correlation matrix using Pearson because all the variables are normally distributed. Since a correlation matrix has redundant information I’m setting half of it to NA.
 thecor<-round(cor(MDF[,sort(c("profile1", "profile2", "profile3", "profile4", "profile5", "profile6", "profile7", "profile8", "profile9", "profile10","profile11", "profile12", "profile13", "profile14", "profile15", "profile16", "profile17", "profile18", "profile19", "profile20","profile21", "profile22", "profile23", "profile24", "profile25"))], method="pearson", use="pairwise.complete.obs"),2) 
 thecor[lower.tri(thecor)]<- NA 
 thecor
-
-# шаг-2. сливаем вместе колонки матрицы используя функцию melt из библиотеки reshape2. удаляем NA значения // melting the columns of the matrix using the melt function from the reshape2 package and drop the records with NA values. 
+	# шаг-4. сшиваем все колонки "profile" используя функцию melt из библиотеки reshape2. удаляем NA значения // melting the columns of the matrix using the melt function from the reshape2 package and drop the records with NA values. 
 library(reshape2)
 thecor<-melt(thecor)
 thecor$Var1<-as.character(thecor$Var1)
 thecor$Var2<-as.character(thecor$Var2)
 thecor<-na.omit(thecor)
 head(thecor)
-
-#  шаг-3. рисуем коррелограмму используя функцию geom_tile
+	#  шаг-5. рисуем кореллограмму используя функцию geom_tile
 Correlogramm_Mariana <- ggplot(thecor, aes(Var2, Var1)) +  
 	geom_tile(data=thecor, aes(fill=value), color="white") +  
 	scale_fill_gradient2(low = "blue", high = "red", mid = "white", midpoint = 0, limit = c(-1,1), name = "Correlation\n(Pearson)") +  
@@ -93,5 +57,4 @@ Correlogramm_Mariana <- ggplot(thecor, aes(Var2, Var1)) +
 		axis.title.x = element_text(face = 2, size = 8, margin = margin(t = .2))) +
 		guides(col = guide_legend(nrow = 1, ncol = 6, byrow = TRUE)) # подправляем дизайн легенды.
 Correlogramm_Mariana
-	
 ggsave("Correlogramm_Mariana.pdf", device = cairo_pdf, fallback_resolution = 300)
